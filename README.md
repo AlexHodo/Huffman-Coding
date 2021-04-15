@@ -1,2 +1,1 @@
-# huffman calculator
- 
+# Huffman coding
