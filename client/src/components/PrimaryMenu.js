@@ -155,7 +155,7 @@ export default function PrimaryMenu() {
             Huffman Coding Calculator
           </Typography>
           <Typography className={classes.titleInfo} variant="body2">
-            v1.0
+            <a href="https://github.com/AlexHodo/huffman-coding" target="_blank">v1.1</a>
           </Typography>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
@@ -171,12 +171,16 @@ export default function PrimaryMenu() {
             </a>
           </div>
           <div className={classes.sectionMobile}>
-            <IconButton aria-label="LinkedIn">
-              <LinkedInIcon color="secondary" />
-            </IconButton>
-            <IconButton aria-label="GitHub repository">
-              <GitHubIcon color="secondary" />
-            </IconButton>
+            <a href="https://www.linkedin.com/in/alexandru-hodorogea-9572a8129/" target="_blank">
+              <IconButton aria-label="LinkedIn">
+                <LinkedInIcon color="secondary" />
+              </IconButton>
+            </a>
+            <a href="https://github.com/AlexHodo/huffman-coding" target="_blank">
+              <IconButton aria-label="GitHub repository">
+                <GitHubIcon color="secondary" />
+              </IconButton>
+            </a>
           </div>
         </Toolbar>
       </AppBar>

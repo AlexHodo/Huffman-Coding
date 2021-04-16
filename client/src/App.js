@@ -82,9 +82,10 @@ const useStyles = makeStyles((theme) => ({
   input: {
     padding: "0.5rem",
     paddingTop: "calc(64px + 0.5rem)",
-    width: "calc(100% - 1rem)",
-    height: "calc(100% - 64px - 1rem) !important",
-    maxHeight: "calc(100% - 64px - 1rem) !important",
+    width: "calc(100% - 1rem) !important",
+    maxWidth: "calc(100% - 1rem) !important",
+    height: "calc(100% - 64px - 1.5rem) !important",
+    maxHeight: "calc(100% - 64px - 1.5rem) !important",
     textAlign: "left",
     overflow: "scroll",
     outline: "none",
@@ -92,6 +93,8 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: "monospace",
     fontWeight: 600,
     letterSpacing: "1px",
+    lineHeight: "1rem",
+    border: "none"
   },
   outputWrapper: {
     position: "relative",
@@ -107,6 +110,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "scroll",
     outline: "none",
     fontSize: "1.25rem",
+    lineHeight: "1rem",
     fontFamily: "monospace",
     fontWeight: 600,
     letterSpacing: "1px",
@@ -178,7 +182,7 @@ const useStyles = makeStyles((theme) => ({
   tab: {
     height: "40px",
     minHeight: "40px",
-    minWidth: "100px",
+    minWidth: "75px",
     fontSize: "0.8rem",
     fontWeight: 500,
     '&.active': {
@@ -225,10 +229,16 @@ function DataTableRow(props) {
         <TableCell colSpan={4} className={classes.tableCellSecondary}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
-              Frequency: {charData.frequencyExtended} (
-              {charData.frequencyPercent}%)
+              <i>c<sub>{charData.isSpecial? charData.specialName : charData.char}</sub></i> = <b><tt>{charData.encoding}</tt></b>
               <br />
-              Encoding length: {charData.encodingLength}
+              <i>l<sub>{charData.isSpecial? charData.specialName : charData.char}</sub></i> = {charData.encodingLength}
+              <br />
+              <i>w<sub>{charData.isSpecial? charData.specialName : charData.char}</sub></i> = {charData.weight}
+              <br />
+              <i>l<sub>{charData.isSpecial? charData.specialName : charData.char}</sub>w<sub>{charData.isSpecial? charData.specialName : charData.char}</sub></i> = {charData.contribution}
+              <br />
+              Frequency: {charData.frequencyExtended} ({charData.frequencyPercent}%)
+              <br />
             </Box>
           </Collapse>
         </TableCell>
@@ -241,7 +251,7 @@ const HtmlTooltip = withStyles((theme) => ({
   tooltip: {
     backgroundColor: "#f5f5f9",
     color: "rgba(0, 0, 0, 0.87)",
-    maxWidth: 220,
+    maxWidth: 350,
     fontSize: theme.typography.pxToRem(12),
     border: "1px solid #dadde9",
   },
@@ -250,7 +260,7 @@ const HtmlTooltip = withStyles((theme) => ({
 export default function App() {
   const initialState = {
     output: "",
-    input: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis erat urna, malesuada et neque sed, efficitur vehicula justo. Curabitur quis faucibus odio. Sed facilisis lacus nec tempor condimentum. Aenean eget odio turpis. Morbi consectetur ante arcu, non tempor arcu volutpat id.",
+    input: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis erat urna, malesuada et neque sed, efficitur vehicula justo. Curabitur quis faucibus odio.\nSed facilisis lacus nec tempor condimentum. Aenean eget odio turpis. Morbi consectetur ante arcu, non tempor arcu volutpat id.",
     inputLength: 0,
     dataLoaded: false,
     data: {},
@@ -261,12 +271,14 @@ export default function App() {
     outputTab: "binary",
     isComputing: false,
     hexadecimal: null,
+    LC: null
   };
 
   const [state, setState] = useState(initialState);
 
   const Axios = axios.create({
     baseURL: "https://hodo.codes/project/huffman-coding/api/",
+    // baseURL: "http://localhost/huffman/api/",
   });
 
   const classes = useStyles();
@@ -301,7 +313,8 @@ export default function App() {
           highlightedKey: null,
           highlightedIndex: null,
           isComputing: false,
-          hexadecimal: response.data.hex
+          hexadecimal: response.data.hex,
+          LC: response.data.LC
         });
       } else {
         alert(response.data.errorMsg);
@@ -333,7 +346,7 @@ export default function App() {
           <TableRow className={classes.tableHead}>
             <TableCell className={classes.tableHeadCell} />
             <TableCell className={classes.tableHeadCell} align="left">
-              Char.
+              Symbol
             </TableCell>
             <TableCell className={classes.tableHeadCell} align="center">
               Freq.
@@ -348,7 +361,32 @@ export default function App() {
             Object.keys(state.frequencies).map((char, index) => (
               <DataTableRow key={index} charData={state.data[`${char}`]} />
             ))}
-
+          {state.dataLoaded && 
+            <TableRow
+              className={classes.tableRow}
+              style={{ paddingBottom: "0px" }}
+            >
+              <TableCell
+                className={classes.tableCell}
+                align="left"
+                colSpan={4}
+                style={{ padding: "1rem" }}
+              >
+                <b>Terms</b>
+                <br/>
+                <i>c<sub>i</sub></i> — codewords of symbol <i>i</i> (binary encoding)
+                <br/>
+                <i>l<sub>i</sub></i> — codeword length (in bits)
+                <br/>
+                <i>w<sub>i</sub></i> — weight of symbol <i>i</i>
+                <br/>
+                <i>l<sub>i</sub>w<sub>i</sub></i> — contribution to weighted path length
+                <br/>
+                <br/>
+                More info about the Huffman coding algorithm can be found <a href="https://en.wikipedia.org/wiki/Huffman_coding" target="_blank">here</a>.
+              </TableCell>
+            </TableRow>
+          }
           {!state.dataLoaded && (
             <TableRow
               className={classes.tableRow}
@@ -368,10 +406,6 @@ export default function App() {
                 <br />
                 <b>Tip!</b> Click on any character to highlight all its
                 occurences.
-                <br />
-                <b>Known issues</b>
-                <br />
-                Avoid typing any special characters or newlines in the input field.
               </TableCell>
             </TableRow>
           )}
@@ -383,48 +417,107 @@ export default function App() {
   const inputHtml = state.dataLoaded ? (
     <div>
       {inputArr.map((char, index) => (
-        <HtmlTooltip
-          key={index + "_input"}
-          title={
-            <React.Fragment>
-              <Typography color="inherit">
-                character{" "}
-                <span className={classes.monospace}>
-                  {state.data[`${char}`]["isSpecial"] ? (
-                    <i>{state.data[`${char}`]["specialName"]}</i>
-                  ) : (
-                    char
-                  )}
-                </span>
-              </Typography>
-              Encoding: <b>{state.data[`${char}`]["encoding"]}</b>
-              <br />
-              Frequency: <b>{state.data[`${char}`]["frequency"]}</b>/
-              <b>{state.inputLength}</b> (
-              {state.data[`${char}`]["frequencyPercent"]}%)
-            </React.Fragment>
+        <>
+          {(state.data[`${char}`]["isSpecial"] && state.data[`${char}`]["specialName"] == "newline")?
+            <>
+              <HtmlTooltip
+                key={index + "_input"}
+                arrow
+                title={
+                  <React.Fragment>
+                    <Typography color="inherit">
+                      symbol{" "}
+                      <span className={classes.monospace}>
+                        {state.data[`${char}`]["isSpecial"] ? (
+                          <i>{state.data[`${char}`]["specialName"]}</i>
+                        ) : (
+                          char
+                        )}
+                      </span>
+                    </Typography>
+                    Encoding: <i>c<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = <tt><b>{state.data[`${char}`]["encoding"]}</b></tt>
+                    <br />
+                    Length: <i>l<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = {state.data[`${char}`]["encodingLength"]}
+                    <br />
+                    Weight: <i>w<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = {state.data[`${char}`]["weight"]}
+                    <br />
+                    Contribution: <i>l<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub>w<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = {state.data[`${char}`]["contribution"]}
+                    <br />
+                    Frequency: {state.data[`${char}`]["frequency"]}/{state.inputLength} ({state.data[`${char}`]["frequencyPercent"]}%)
+                    <br />
+                  </React.Fragment>
+                }
+              >
+                <span
+                  style={{ color: state.data[`${char}`]["color"] }}
+                  onClick={() => {
+                    setState({
+                      ...state,
+                      highlightedIndex: index,
+                      highlightedKey: state.data[`${char}`]["key"],
+                    });
+                  }}
+                  className={`${classes.characterWrapper}${
+                    state.highlightedIndex == index ? " highlightedIndex" : ""
+                  }${
+                    state.highlightedKey == state.data[`${char}`]["key"]
+                      ? " highlightedKey"
+                      : ""
+                  } "newlineChar"`}
+                >&#8629;</span> 
+              </HtmlTooltip>
+              <br/>
+            </>:
+            <HtmlTooltip
+                key={index + "_input"}
+                arrow
+                title={
+                  <React.Fragment>
+                    <Typography color="inherit">
+                      symbol{" "}
+                      <span className={classes.monospace}>
+                        {state.data[`${char}`]["isSpecial"] ? (
+                          <i>{state.data[`${char}`]["specialName"]}</i>
+                        ) : (
+                          char
+                        )}
+                      </span>
+                    </Typography>
+                    Encoding: <i>c<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = <tt><b>{state.data[`${char}`]["encoding"]}</b></tt>
+                    <br />
+                    Length: <i>l<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = {state.data[`${char}`]["encodingLength"]}
+                    <br />
+                    Weight: <i>w<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = {state.data[`${char}`]["weight"]}
+                    <br />
+                    Contribution: <i>l<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub>w<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = {state.data[`${char}`]["contribution"]}
+                    <br />
+                    Frequency: {state.data[`${char}`]["frequency"]}/{state.inputLength} ({state.data[`${char}`]["frequencyPercent"]}%)
+                    <br />
+                  </React.Fragment>
+                }
+              >
+              <span
+                style={{ color: state.data[`${char}`]["color"] }}
+                onClick={() => {
+                  setState({
+                    ...state,
+                    highlightedIndex: index,
+                    highlightedKey: state.data[`${char}`]["key"],
+                  });
+                }}
+                className={`${classes.characterWrapper}${
+                  state.highlightedIndex == index ? " highlightedIndex" : ""
+                }${
+                  state.highlightedKey == state.data[`${char}`]["key"]
+                    ? " highlightedKey"
+                    : ""
+                }`}
+              >
+                {char}
+              </span>
+            </HtmlTooltip>
           }
-        >
-          <span
-            style={{ color: state.data[`${char}`]["color"] }}
-            onClick={() => {
-              setState({
-                ...state,
-                highlightedIndex: index,
-                highlightedKey: state.data[`${char}`]["key"],
-              });
-            }}
-            className={`${classes.characterWrapper} ${
-              state.highlightedIndex == index ? "highlightedIndex" : ""
-            } ${
-              state.highlightedKey == state.data[`${char}`]["key"]
-                ? "highlightedKey"
-                : ""
-            }`}
-          >
-            {char}
-          </span>
-        </HtmlTooltip>
+          </>
       ))}
     </div>
   ) : (
@@ -436,30 +529,33 @@ export default function App() {
       <div>
         {inputArr.map((char, index) => (
           <HtmlTooltip
-            key={index + "_output"}
-            title={
-              <React.Fragment>
-                <Typography color="inherit">
-                  code{" "}
-                  <span className={classes.monospace}>
-                    {state.data[`${char}`]["encoding"]}
-                  </span>
-                </Typography>
-                Character:{" "}
-                <b>
-                  {state.data[`${char}`]["isSpecial"] ? (
-                    <i>{state.data[`${char}`]["specialName"]}</i>
-                  ) : (
-                    char
-                  )}
-                </b>
-                <br />
-                Frequency: <b>{state.data[`${char}`]["frequency"]}</b>/
-                <b>{state.inputLength}</b> (
-                {state.data[`${char}`]["frequencyPercent"]}%)
-              </React.Fragment>
-            }
-          >
+                key={index + "_output"}
+                arrow
+                title={
+                  <React.Fragment>
+                    <Typography color="inherit">
+                      symbol{" "}
+                      <span className={classes.monospace}>
+                        {state.data[`${char}`]["isSpecial"] ? (
+                          <i>{state.data[`${char}`]["specialName"]}</i>
+                        ) : (
+                          char
+                        )}
+                      </span>
+                    </Typography>
+                    Encoding: <i>c<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = <tt><b>{state.data[`${char}`]["encoding"]}</b></tt>
+                    <br />
+                    Length: <i>l<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = {state.data[`${char}`]["encodingLength"]}
+                    <br />
+                    Weight: <i>w<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = {state.data[`${char}`]["weight"]}
+                    <br />
+                    Contribution: <i>l<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub>w<sub>{state.data[`${char}`]["isSpecial"]? state.data[`${char}`]["specialName"] : char}</sub></i> = {state.data[`${char}`]["contribution"]}
+                    <br />
+                    Frequency: {state.data[`${char}`]["frequency"]}/{state.inputLength} ({state.data[`${char}`]["frequencyPercent"]}%)
+                    <br />
+                  </React.Fragment>
+                }
+              >
             <span
               style={{ color: state.data[`${char}`]["color"] }}
               onClick={() => {
@@ -557,12 +653,11 @@ export default function App() {
                     {inputHtml}
                   </div>
                 ) : (
-                  <ContentEditable
+                  <textarea
                     className={classes.input}
-                    tagName="article"
-                    html={state.input}
+                    value={state.input}
                     onChange={handleInputChange}
-                    contentEditable={"plaintext-only"}
+                    style={{resize: "none"}}
                   />
                 )}
               </div>
@@ -588,7 +683,7 @@ export default function App() {
                                                   
                           })
                         } 
-                        label="Binary" 
+                        label="Bin" 
                         style={{"height": "40px"}} 
                         className={`${classes.tab} ${state.outputTab == "binary" && "active"}`} 
                       />
@@ -600,13 +695,14 @@ export default function App() {
                                                   
                           })
                         } 
-                        label="Hexadecimal" 
+                        label="Hex" 
                         style={{"height": "40px"}} 
                         className={`${classes.tab} ${state.outputTab == "hexadecimal" && "active"}`} 
                       />
                     </Tabs>
                   </Grid>
                   <Grid item xs={6} align="right">
+                    {state.dataLoaded && <Typography variant="span" className={classes.secondaryMenuInfo}><i>L(C)</i>={state.LC}</Typography>}
                     <Typography variant="overline">Output</Typography>
                   </Grid>
                 </Grid>
