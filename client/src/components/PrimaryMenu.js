@@ -155,7 +155,7 @@ export default function PrimaryMenu() {
             Huffman Coding Calculator
           </Typography>
           <Typography className={classes.titleInfo} variant="body2">
-            <a href="https://github.com/AlexHodo/huffman-coding" target="_blank">v1.1</a>
+            <a href="https://github.com/AlexHodo/huffman-coding" target="_blank">v1.2</a>
           </Typography>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>

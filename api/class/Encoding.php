@@ -45,6 +45,7 @@ class Encoding
 		}
 		$this->ComputeFrequencies();
 		return true;
+
 	}
 
 	public function GetOutput() {
@@ -77,18 +78,25 @@ class Encoding
 			$tmpNode->right = $this->tree[sizeof($this->tree)-2];
 			$tmpNode->frequency = $tmpNode->left->frequency + $tmpNode->right->frequency;
 
-
 			unset($this->tree[sizeof($this->tree)-1]);
 			unset($this->tree[sizeof($this->tree)-1]);
 
-			$rightIndex = sizeof($this->tree)-1;
+			if($tmpNode->frequency <= $this->tree[sizeof($this->tree)-1]->frequency) {
 
-			for($i = $rightIndex; $i >= 0; $i--) {
-				if($this->tree[$i]->frequency < $tmpNode->frequency) {
-					$rightIndex = $i;
-				} else {
-					break;
+				$rightIndex = sizeof($this->tree);
+
+			} else {
+
+				$rightIndex = sizeof($this->tree)-1;
+
+				for($i = $rightIndex; $i >= 0; $i--) {
+					if($this->tree[$i]->frequency < $tmpNode->frequency) {
+						$rightIndex = $i;
+					} else {
+						break;
+					}
 				}
+
 			}
 
 			for($i = sizeof($this->tree); $i > $rightIndex; $i--) {

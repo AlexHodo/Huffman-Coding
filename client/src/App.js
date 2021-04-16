@@ -47,8 +47,8 @@ const theme = createMuiTheme({
 const useStyles = makeStyles((theme) => ({
   primaryMenu: {},
   secondaryMenu: {
-    background: "rgba(237,239,241,0.8)",
-    backdropFilter: "blur(5px)",
+    background: "rgba(237,239,241,0.9)",
+    backdropFilter: "blur(3px)",
     position: "absolute",
     width: "100%",
     height: "40px",
@@ -87,7 +87,6 @@ const useStyles = makeStyles((theme) => ({
     height: "calc(100% - 64px - 1.5rem) !important",
     maxHeight: "calc(100% - 64px - 1.5rem) !important",
     textAlign: "left",
-    overflow: "scroll",
     outline: "none",
     fontSize: "1.25rem",
     fontFamily: "monospace",
@@ -100,14 +99,12 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
     width: "100%",
     height: "100%",
-    overflow: "hidden",
   },
   output: {
     padding: "0.5rem",
     width: "calc(100% - 1rem)",
     height: "calc(100% - 1rem - 40px) !important",
     textAlign: "left",
-    overflow: "scroll",
     outline: "none",
     fontSize: "1.25rem",
     lineHeight: "1rem",
@@ -115,6 +112,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     letterSpacing: "1px",
     paddingTop: "calc(40px + 0.5rem)",
+    
   },
   sidebarWrapper: {
     paddingTop: "64px",
@@ -152,9 +150,9 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
   },
   contentPanels: {
-    "& *": {
-      overflow: "scroll",
-    },
+    "& *:not(.ofAuto)": {
+      overflow: "hidden !important"
+    }
   },
   table: {},
   tableRow: {
@@ -423,7 +421,6 @@ export default function App() {
             <>
               <HtmlTooltip
                 key={index + "_input"}
-                arrow
                 title={
                   <React.Fragment>
                     <Typography color="inherit">
@@ -471,7 +468,6 @@ export default function App() {
             </>:
             <HtmlTooltip
                 key={index + "_input"}
-                arrow
                 title={
                   <React.Fragment>
                     <Typography color="inherit">
@@ -531,7 +527,6 @@ export default function App() {
         {inputArr.map((char, index) => (
           <HtmlTooltip
                 key={index + "_output"}
-                arrow
                 title={
                   <React.Fragment>
                     <Typography color="inherit">
@@ -650,7 +645,7 @@ export default function App() {
                   </Grid>
                 </Grid>
                 {state.dataLoaded ? (
-                  <div className={classes.input} tagName="article">
+                  <div className={`${classes.input} ofAuto`} tagName="article">
                     {inputHtml}
                   </div>
                 ) : (
@@ -707,7 +702,7 @@ export default function App() {
                     <Typography variant="overline">Output</Typography>
                   </Grid>
                 </Grid>
-                <div className={classes.output}>{outputHtml}</div>
+                <div className={`${classes.output} ofAuto`}>{outputHtml}</div>
               </div>
             </SplitPane>
           </SplitPane>
