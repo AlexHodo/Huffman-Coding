@@ -38,12 +38,10 @@ class Encoding
 
 	public function SetInput($input) {
 
-		$input = trim($input);
-
 		if(!$this->ValidateInput($input)) {
 			return false;
 		} else {
-			$this->input = trim($input);
+			$this->input = $input;
 		}
 		$this->ComputeFrequencies();
 		return true;

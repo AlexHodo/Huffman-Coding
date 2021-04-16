@@ -25,7 +25,6 @@ if(!isset($_POST['input'])) {
 
 	$input = $_POST['input'];
 
-	$response['input'] = $input;
 	$encoding = new Encoding();
 	if(!$encoding->SetInput($input)) {
 
@@ -43,6 +42,7 @@ if(!isset($_POST['input'])) {
 		$response['frequencies'] = $encoding->frequencies;
 		$response['length'] = $encoding->inputLength;
         $response['data'] = array();
+		$response['input'] = $encoding->input;
         $frequencies = $encoding->frequencies;
         $inputLength = $encoding->inputLength;
         $response['LC'] = 0;

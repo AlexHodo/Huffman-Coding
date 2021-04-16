@@ -5,8 +5,8 @@ define("MAX_LEN", 2048);
     
 ini_set('serialize_precision', -1);
 
-/* 
 // For testing on localhost
+/*
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST");

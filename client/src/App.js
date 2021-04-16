@@ -130,6 +130,7 @@ const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
     display: "inline-block",
     whiteSpace: "pre",
+    overflow: "hidden !important",
     "&.highlightedIndex": {
       color: "white !important",
       background: "black !important",
@@ -695,7 +696,7 @@ export default function App() {
                                                   
                           })
                         } 
-                        label="Hex" 
+                        label="B64" 
                         style={{"height": "40px"}} 
                         className={`${classes.tab} ${state.outputTab == "hexadecimal" && "active"}`} 
                       />
