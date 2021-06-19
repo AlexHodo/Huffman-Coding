@@ -276,8 +276,8 @@ export default function App() {
   const [state, setState] = useState(initialState);
 
   const Axios = axios.create({
-    baseURL: "https://hodo.codes/project/huffman-coding/api/",
-    // baseURL: "http://localhost/huffman/api/",
+    // baseURL: "https://hodo.codes/project/huffman-coding/api/",
+    baseURL: "http://localhost/huffman/api/",
   });
 
   const classes = useStyles();

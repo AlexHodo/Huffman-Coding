@@ -3,6 +3,7 @@
 require_once __DIR__ . "/init.php";
 require_once __DIR__ . "/class/Encoding.php";
 
+// Initialize the JSON output object
 $response = array(
 	"success" => false,
 	"errorMsg" => null,
@@ -16,7 +17,7 @@ $response = array(
     "LC" => null
 );
 
-if(!isset($_POST['input'])) {
+if(!isset($_POST['input'])) { // input is a mandatory POST parameter
 
 	$response['success'] = false;
 	$response['errorMsg'] = "Required field not set (input).";
@@ -25,15 +26,15 @@ if(!isset($_POST['input'])) {
 
 	$input = $_POST['input'];
 
-	$encoding = new Encoding();
-	if(!$encoding->SetInput($input)) {
+	$encoding = new Encoding(); // initialize the Encoding class
+	if(!$encoding->SetInput($input)) { // if setting the input fails
 
 		$response['success'] = false;
 		$response['errorMsg'] = $encoding->errorMsg;
 
-	} else {
+	} else { // if setting the innput is successful
 
-		$encoding->Encode();
+		$encoding->Encode(); // encode the input and change the contents of $response accordingly 
 		$response['success'] = true;
 		$response['errorMsg'] = null;
 		$response['bin'] = $encoding->output;
@@ -49,9 +50,9 @@ if(!isset($_POST['input'])) {
         $key = 0;
         $colorsCount = sizeof($encoding->leaves);
         $count = 1;
-        foreach($encoding->leaves as $char=>$encoding) {
+        foreach($encoding->leaves as $char=>$encoding) { // for each leaf of the generated tree
         	$response['LC'] += strlen($encoding) * ($frequencies[$char] / $inputLength);
-        	$color = "hsl(" . (360/$colorsCount * $count++). ", 100%, " . rand(30,40) . "%)";
+        	$color = "hsl(" . (360/$colorsCount * $count++). ", 100%, " . rand(30,40) . "%)"; // generate a distinct color for each character
             $response['data'][$char] = array(
                 "encoding" => $encoding,
                 "encodingLength" => strlen($encoding),
@@ -71,6 +72,14 @@ if(!isset($_POST['input'])) {
 	}
 }
 
+/**
+ *
+ * Check if a character is special (currently, it checks whether the character is a whitespace or a newline)
+ *
+ * @param char $char : a character
+ * @return bool : $char is a special char
+ *
+**/
 function isSpecial($char) {
 	if($char == " ") {
 		return "whitespace";
@@ -81,4 +90,4 @@ function isSpecial($char) {
 	}
 }
 
-echo json_encode($response);
+echo json_encode($response); // print the JSON object

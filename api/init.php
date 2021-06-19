@@ -19,6 +19,14 @@ header('Content-Type: application/json');
 $postData = json_decode(file_get_contents('php://input'), true);
 $_POST = $postData;
 
+/**
+ *
+ * Converts binary data to base 64
+ *
+ * @param string $bin : binary data
+ * @return string : base 64 data
+ *
+**/
 function bin2base64($bin) {
     $arr = str_split($bin, 8);
     $str = '';
