@@ -11,7 +11,10 @@ https://hodo.codes/project/huffman-coding/
 * Front-end enhancements
 * Decode function
 
-## New in v1.1
+### New in v1.2
+* Algorithm opimization
+* Client improvements
+### New in v1.1
 * Better encoding analysis 
 * Users can now type newlines in the input field
 * Client improvements
